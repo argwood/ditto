@@ -31,9 +31,16 @@ async def on_message(message):
 async def on_reaction_add(reaction, user): # it's probably smarter to wait_for(ditto_react) instead of check any time someone reacts on an image - TBD but this works for now
     message = reaction.message
     if _ditto.check_file_type(reaction.message):
-        await client.send_message(message.channel, 'Great, that\'s a supported file type!')
+        #await client.send_message(message.channel, 'Great, that\'s a supported file type!')
         if _ditto.check_for_ditto_react(reaction):
-            await client.send_message(message.channel, 'You even used the right reaction!') # passed the reaction tests; here you would actually call library functions
+            await _ditto.prompt_user(message)
+            #await client.send_message(message.channel, 'You even used the right reaction!') # passed the reaction tests; here you would actually call library functions
+            #await client.send_message(message.channel, 'Your ID is {}'.format(message.author.id))
+            #await client.send_message(message.channel, 'Your file address is {}'.format(message.attachments[0].get("url")))
+            _ditto.start_query('test', message.author.id, message.attachments[0].get("url"))
+
+
+
         else: await client.send_message(message.channel, 'Okay but that\'s not a ditto')
     else: await client.send_message(message.channel, 'You\'ve just reacted to a message...cool I guess')
 
