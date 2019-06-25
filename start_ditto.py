@@ -1,7 +1,10 @@
+import json
 import discord
 import asyncio
 import ditto
 
+
+config = json.load(open("config.json"))
 
 '''
 ditto: your media squire for Discord
@@ -12,7 +15,7 @@ usage: python3 start_ditty.py
 
 client = discord.Client()
 
-token = 'NTkyNzkzOTg5NjgyNDI5OTc1.XREgqw.2EevJ7HjFfeovaDDvzB9Um4FDho' # don't forget to move token to a config file
+token = config['token'] # don't forget to move token to a config file
 
 _ditto = ditto.Ditto(client)
 
