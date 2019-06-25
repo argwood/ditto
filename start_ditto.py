@@ -52,4 +52,4 @@ if __name__ == "__main__":
     try:
         client.run(token)
     except:
-client.close()
+        client.close()
