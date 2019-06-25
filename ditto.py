@@ -37,14 +37,23 @@ class Ditto:
                 desc += '**$newLibrary** <library name>'
                 em = discord.Embed(description=desc, title = title, color = 0x7289DA)
 
-                def check(msg):
-                    if msg.content.startswith('$newLibrary'):
-                        return True
+                #def check(msg):
+                #    if msg.content.startswith('$newLibrary'):
+                #        return True
 
                 await self._client.send_message(message.channel, embed = em)
-                response = await self._client.wait_for_message(author=message.author, check=check)
+                response = await self._client.wait_for_message(author=message.author)
                 if '$newLibrary' in response.content:
                     await self.new_library(message, response)
+                elif response.content in libs:
+                    await self.add_to_library(message, response)
+                else:
+                    await self._client.send_message(message.channel, 'That library doesn\'t exist. Use `$newLibrary <library name>` to create a new library.')
+                    response = await self._client.wait_for_message(author=message.author)
+                    if response.content.startswith('$newLibrary'):
+                        await self.new_library(message, response)
+                    elif response.content in libs:
+                        await self.add_to_library(message, response)
 
 
         async def new_library(self, message, response):
@@ -54,14 +63,16 @@ class Ditto:
                     self.start_query('create_new_lib', message.author.id, message.attachments[0].get("url"))
                     await self._client.send_message(message.channel, ('New library `' + new_lib +'` has been created for `{}`'.format(message.author.display_name)))
                 else:
-                    await self._client.send_message(message.channel, ('Please provide a name for the new library using `$newLibrary <library name>`'))
+                    await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>`'))
                     response = await self._client.wait_for_message(author=message.author)
-                    if '$newLibrary' in response.content:
+                    if response.content.startswith('$newLibrary'):
                         await self.new_library(message, response)
 
-        def add_to_library(self):
+        async def add_to_library(self, message, response):
                 ''' Add file to existing library '''
-				pass
+                lib = response.content
+                self.start_query('add_to_lib', message.author.id, message.attachments[0].get("url")) # send lib here too
+                await self._client.send_message(message.channel, 'File added to library `' + lib +'`!')
 
 
 
@@ -69,9 +80,11 @@ class Ditto:
                 ''' Check if user response for library option is valid'''
                 pass
 
-        def share_library(self):
+        async def share_library(self, message):
                 ''' $Library <library name> - Returns a library to message channel where left and right arrows can flip through files'''
-                pass
+
+                await self._client.send_message(message.channel, 'Here is a placeholder that will be your library')
+
 
         def surprise(self):
                 ''' $surpriseMe - Returns a randomly chosen photo '''
