@@ -4,12 +4,11 @@ import asyncio
 import ditto
 
 
-config = json.load(open("config.json"))
 
 '''
 ditto: your media squire for Discord
 
-usage: python3 start_ditty.py
+usage: python3 start_ditto.py
 '''
 
 
