@@ -9,9 +9,8 @@ def get_user_dir(user_id):
 		return True
 	else:
 		print("Cannot find user dir.. making one")
+		create_user_dir(user_id):
+		return False
 
-	"""
-	for subdir, dirs, files in os.walk(USERDIRS, topdown=False):
-		for name in dirs:
-			print(name)
-	"""
+def create_user_dir(dir_name):
+	print("Created directory for {user_id}".format(dir_name))
