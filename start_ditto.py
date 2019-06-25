@@ -1,4 +1,4 @@
-import json
+import os
 import discord
 import asyncio
 import ditto
@@ -15,7 +15,7 @@ usage: python3 start_ditty.py
 
 client = discord.Client()
 
-token = config['token'] # don't forget to move token to a config file
+token = os.environ['TOKEN'] # don't forget to move token to a config file
 
 _ditto = ditto.Ditto(client)
 
