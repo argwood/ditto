@@ -26,6 +26,8 @@ async def on_ready():
 async def on_message(message):
     if message.content.startswith('$Library'): # just a basic test to be used to see if bot is on
         await _ditto.share_library(message)
+    elif message.content.startswith('$help'):
+        await _ditto.help_msg(message)
 
 ## below should be moved to a new file; all message responses are temporary for testing
 
@@ -43,8 +45,8 @@ async def on_reaction_add(reaction, user): # it's probably smarter to wait_for(d
 
 
 
-        else: await client.send_message(message.channel, 'Okay but that\'s not a ditto')
-    else: await client.send_message(message.channel, 'You\'ve just reacted to a message...cool I guess')
+        #else: await client.send_message(message.channel, 'Okay but that\'s not a ditto')
+    #else: await client.send_message(message.channel, 'You\'ve just reacted to a message...cool I guess')
 
 if __name__ == "__main__":
 
