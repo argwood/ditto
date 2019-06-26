@@ -1,0 +1,31 @@
+RUNNING TESTS...
+
+Current test: get_user_dir_path(1)
+	Cannot find user dir.. making one
+	Created directory ./user_directories/1
+	./user_directories/1
+
+Current test: creating libraries for user 1
+	Successfully created dogs for 1
+	Success!
+	Successfully created cats for 1
+	Success!
+	Successfully created bats for 1
+	Success!
+
+Current test: get_user_dir_path(4)
+	Cannot find user dir.. making one
+	Created directory ./user_directories/4
+	./user_directories/4
+
+Current test: get_user_libs(1)
+	['cats', 'bats', 'dogs']
+
+Current test: get_user_libs(3)
+	Cannot find user dir.. making one
+	Created directory ./user_directories/3
+	[]
+
+Current Test: Testing Library Creation
+	Successfully created dogs for 4
+	Success!
