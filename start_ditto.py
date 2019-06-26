@@ -30,6 +30,8 @@ async def on_message(message):
         await _ditto.delete_library(message)
     elif message.content.startswith('$myLibraries'):
         await _ditto.list_libraries(message)
+    elif message.content.startswith('$surpriseMe'):
+        await _ditto.surprise(message)
     elif message.content.startswith('$help'):
         await _ditto.help_msg(message)
 

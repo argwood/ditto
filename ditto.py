@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import ditto_backend
+import random
 
 class Ditto:
 
@@ -130,7 +131,7 @@ class Ditto:
             message (Discord.py message object): the message that contains the file
             lib (str): library name to add file to
         """
-        self.start_query('add_to_lib', message.author.id, message.attachments[0].get("url")) # send lib here too
+        ditto_backend.add_img_to_lib(message.author.id, lib, message.attachments[0].get("filename"), message.attachments[0].get("url"))
         await self._client.send_message(message.channel, 'File added to library `' + lib +'`!')
 
     def check_for_library(self, user, lib):
@@ -185,14 +186,32 @@ class Ditto:
 
         await self._client.send_message(message.channel, embed = em)
 
-    def surprise(self, message):
+    async def surprise(self, message):
         """
         Usage: Upon user command `$surpriseMe`, returns a randomly chosen photo from any of the user's libraries to message channel
 
         Parameters:
             message (Discord.py message object)
         """
-        pass
+        user_libs = ditto_backend.get_user_libs(message.author.id)
+
+        if len(message.content.split()) > 1:
+            lib = message.content.split(' ', 1)[1]
+            if lib in user_libs:
+                ditto_backend.get_random_image(message.author.id, lib)
+
+                await self._client.send_message(message.channel, ('Here\'s a random image from the library {}'.format(lib)))
+            else:
+                await self._client.send_message(message.channel, ('Library not found.  Here\'s a random image instead!'))
+                lib_rand = random.randint(0, len(user_libs)-1)
+                ditto_backend.get_random_image(message.author.id, lib_rand)
+
+        else:
+            lib_rand = random.randint(0, len(user_libs)-1)
+            ditto_backend.get_random_image(message.author.id, lib_rand)
+            await self._client.send_message(message.channel, ('Here\'s a random image from the library {}'.format(user_libs[lib_rand])))
+
+
 
     async def help_msg(self, message):
         """
@@ -209,9 +228,4 @@ class Ditto:
         em.add_field(name = '$deleteLibrary <library name>', value = 'Delete a library', inline=False)
         em.add_field(name = '$surpriseMe', value = 'Pick a photo at random', inline=False)
         await self._client.send_message(message.channel, embed=em)
-
-
-
-
-
 
