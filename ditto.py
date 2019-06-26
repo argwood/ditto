@@ -7,7 +7,6 @@ class Ditto:
         def __init__(self, client):
                 self._client = client
                 self.blurple = 0x7289DA
-                #other things
 
         def check_file_type(self, message):
                 ''' Determine the file type of a message that has been reacted to (message.attachments)'''
@@ -28,10 +27,11 @@ class Ditto:
 
         async def on_ditto_react(self, message):
                 ''' Start here if user reacts :ditto: on a file '''
-                #libs = ditto_backend.get_user_libs(message.author.id)
 
-                self.start_query('get_user_libs', message.author.id, message.attachments[0].get("url"))
-                libs = ['Dog Memes', 'Food'] # placeholder - this will be what the query returns
+                user_path = ditto_backend.get_user_dir_path(message.author.id)
+                print(user_path)
+
+                libs = ditto_backend.get_user_libs(message.author.id)
                 await self._client.send_message(message.channel, ('`{}`, what library do you want to save this photo in?'.format(message.author.display_name)))
                 title = message.author.display_name + '\'s Libraries'
                 desc = ''
@@ -60,7 +60,7 @@ class Ditto:
 
                 if len(response.content.split()) > 1:
                     new_lib = response.content.split(' ', 1)[1]
-                    self.start_query('create_new_lib', message.author.id, message.attachments[0].get("url"))
+                    ditto_backend.create_lib(message.author.id, new_lib)
                     await self._client.send_message(message.channel, ('New library `' + new_lib +'` has been created for `{}`'.format(message.author.display_name)))
                 else:
                     await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>`'))
@@ -93,12 +93,13 @@ class Ditto:
 
         def check_for_library(self, user, lib):
                 ''' Check if user response for library option is valid'''
-                self.start_query('get_user_libs', user, '')
-                user_libs = ['Dog Memes', 'Food'] #placeholder for output of query
+
+                user_libs = ditto_backend.get_user_libs(user)
                 return lib in user_libs
 
         async def share_library(self, message):
                 ''' $Library <library name> - Returns a library to message channel where left and right arrows can flip through files'''
+
                 if len(message.content.split()) > 1:
                     lib = message.content.split(' ', 1)[1]
                     self.start_query('get_lib', message.author.id, lib)
@@ -112,8 +113,7 @@ class Ditto:
         async def list_libraries(self, message):
                 ''' $myLibraries - Returns a list of your current libraries '''
 
-                self.start_query('get_user_libs', message.author.id, '')
-                libs = ['Dog Memes', 'Food'] #placeholder for output of query
+                libs = ditto_backend.get_user_libs(message.author.id)
 
                 title = message.author.display_name + '\'s Libraries'
                 desc = ''
