@@ -9,7 +9,7 @@ def get_user_dir(user_id):
 		return True
 	else:
 		print("Cannot find user dir.. making one")
-		create_user_dir(user_id):
+		create_user_dir(user_id)
 		return False
 
 def create_user_dir(dir_name):
