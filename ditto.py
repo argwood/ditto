@@ -35,6 +35,7 @@ class Ditto:
 
         ditto_emoji = discord.utils.get(reaction.message.server.emojis, name="ditto")
         ditto_emoji=(str(ditto_emoji)[1:8])
+        print(reaction)
         return ditto_emoji == ':ditto:'
 
     def start_query(self, command, author_id, file_url):
@@ -93,13 +94,15 @@ class Ditto:
                 ditto_backend.create_lib(message.author.id, new_lib)
                 await self._client.send_message(message.channel, ('New library `' + new_lib +'` has been created for `{}`'.format(message.author.display_name)))
             else:
-                await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>`'))
+                await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>` or type `$stop` to cancel.'))
                 response = await self._client.wait_for_message(author=message.author)
-                await self.new_library(response)
+                if '$stop' not in response.content:
+                    await self.new_library(response)
         else:
-            await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>`'))
+            await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>` or type `$stop` to cancel.'))
             response = await self._client.wait_for_message(author=message.author)
-            await self.new_library(response)
+            if '$stop' not in response.content:
+                await self.new_library(response)
 
     async def delete_library(self, message):
         """
@@ -160,8 +163,12 @@ class Ditto:
 
         if len(message.content.split()) > 1:
             lib = message.content.split(' ', 1)[1]
-            self.start_query('get_lib', message.author.id, lib)
+            img_url = ditto_backend.get_lib_image(message.author.id, 'ditto', 'ditto.jpg')
             await self._client.send_message(message.channel, 'Here is a placeholder that will be your library')
+            msg = await self._client.send_file(message.channel, img_url)
+            #left_arrow = self._client.get_emoji
+            await self._client.add_reaction(msg, '\u2B05') # left arrow
+            await self._client.add_reaction(msg, '\u27A1') # right arrow
         else:
             await self._client.send_message(message.channel, ('Please provide a library name using `$Library <library name>`'))
 
