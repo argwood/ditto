@@ -14,7 +14,7 @@ usage: python3 start_ditto.py
 
 client = discord.Client()
 
-token = "NTkyNzkzOTg5NjgyNDI5OTc1.XREgqw.2EevJ7HjFfeovaDDvzB9Um4FDho"#os.environ['TOKEN'] # don't forget to move token to a config file
+token = os.environ['TOKEN'] # don't forget to move token to a config file
 
 _ditto = ditto.Ditto(client)
 
