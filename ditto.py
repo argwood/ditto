@@ -164,9 +164,6 @@ class Ditto:
             await self._client.send_message(message.channel, 'Here is a placeholder that will be your library')
         else:
             await self._client.send_message(message.channel, ('Please provide a library name using `$Library <library name>`'))
-            message = await self._client.wait_for_message(author=message.author)
-            if message.content.startswith('$Library'):
-                await self.share_library(message)
 
     async def list_libraries(self, message):
         """
@@ -200,7 +197,7 @@ class Ditto:
             if lib in user_libs:
                 ditto_backend.get_random_image(message.author.id, lib)
 
-                await self._client.send_message(message.channel, ('Here\'s a random image from the library {}'.format(lib)))
+                await self._client.send_message(message.channel, ('Here\'s a random image from the library `{}`'.format(lib)))
             else:
                 await self._client.send_message(message.channel, ('Library not found.  Here\'s a random image instead!'))
                 lib_rand = random.randint(0, len(user_libs)-1)
@@ -209,7 +206,10 @@ class Ditto:
         else:
             lib_rand = random.randint(0, len(user_libs)-1)
             ditto_backend.get_random_image(message.author.id, lib_rand)
-            await self._client.send_message(message.channel, ('Here\'s a random image from the library {}'.format(user_libs[lib_rand])))
+            img_url = ditto_backend.get_lib_image(message.author.id, 'ditto', 'ditto.jpg')
+            print(img_url)
+            await self._client.send_message(message.channel, ('Here\'s a random image from the library `{}`'.format(user_libs[lib_rand])))
+            await self._client.send_file(message.channel, img_url)
 
 
 

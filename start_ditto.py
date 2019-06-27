@@ -17,7 +17,7 @@ client = discord.Client()
 token = os.environ['TOKEN'] # don't forget to move token to a config file
 
 _ditto = ditto.Ditto(client)
-
+print(discord.__version__)
 @client.event
 async def on_ready():
     print('Improving your Discord multimedia experience...') # maybe Kevin can come up with a clever message to print when the bot wakes up
