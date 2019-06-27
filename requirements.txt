@@ -3,10 +3,7 @@
 
 # ditto.py: 1
 # start_ditto.py: 2
-discord.py == 1.1.1
-
-# start_ditto.py: 4
-ditto == 1.2.4
+discord.py == 1.2.3
 
 # ditto_backend.py: 1
 requests == 2.18.4
