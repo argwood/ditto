@@ -30,7 +30,7 @@ class Ditto:
                 ''' Start here if user reacts :ditto: on a file '''
                 #libs = ditto_backend.get_user_libs(message.author.id)
 
-                self.start_query('get_user_libs', message.author.id, message.attachments[0].get("url"))
+                self.start_query('get_user_libs', message.author.id, message.attachments[0].url)
                 libs = ['Dog Memes', 'Food'] # placeholder - this will be what the query returns
                 await self._client.send_message(message.channel, ('`{}`, what library do you want to save this photo in?'.format(message.author.display_name)))
                 title = message.author.display_name + '\'s Libraries'
