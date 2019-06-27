@@ -64,7 +64,7 @@ class Ditto:
         await self._client.send_message(message.channel, embed = em)
         response = await self._client.wait_for_message(author=message.author)
         if '$newLibrary' in response.content:
-            await self.new_library(response)
+            await self.new_library(response, message.attachments[0])
         elif response.content in libs:
             lib = response.content.strip()
             await self.add_to_library(message, lib)
@@ -77,7 +77,7 @@ class Ditto:
                 await self._client.send_message(message.channel, ('New library `' + lib +'` has been created for `{}`'.format(message.author.display_name)))
 
 
-    async def new_library(self, message):
+    async def new_library(self, message, img):
         """
         Usage: Upon user command `$newLibrary`, checks if user has supplied a name for new library;
         Creates a library if so, otherwise prompts for a library name
@@ -90,6 +90,7 @@ class Ditto:
             if len(message.content.split()) > 1:
                 new_lib = message.content.split(' ', 1)[1]
                 ditto_backend.create_lib(message.author.id, new_lib)
+                await self.add_to_library(message, img, new_lib)
                 await self._client.send_message(message.channel, ('New library `' + new_lib +'` has been created for `{}`'.format(message.author.display_name)))
             else:
                 await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>` or type `$stop` to cancel.'))
@@ -102,7 +103,7 @@ class Ditto:
             await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>` or type `$stop` to cancel.'))
             response = await self._client.wait_for_message(author=message.author)
             if '$stop' not in response.content:
-                await self.new_library(response)
+                await self.new_library(response, img)
             else:
                 await self._client.send_message(message.channel, 'This file has not been saved.')
 
@@ -128,7 +129,7 @@ class Ditto:
         else:
             await self._client.send_message(message.channel, ('Please provide a name for the library you want to delete using `$deleteLibrary <library name>`.'))
 
-    async def add_to_library(self, message, lib):
+    async def add_to_library(self, message, img, lib):
         """
         Usage: Adds the file the user reacted to to an existing library
 
@@ -136,7 +137,7 @@ class Ditto:
             message (Discord.py message object): the message that contains the file
             lib (str): library name to add file to
         """
-        ditto_backend.add_img_to_lib(message.author.id, lib, message.attachments[0].get("filename"), message.attachments[0].get("url"))
+        ditto_backend.add_img_to_lib(message.author.id, lib, img.get("filename"), img.get("url"))
         await self._client.send_message(message.channel, 'File added to library `' + lib +'`!')
 
     def check_for_library(self, user, lib):
