@@ -17,7 +17,7 @@ class Ditto:
         def check_for_ditto_react(self, reaction):
                 ''' Check if the reaction to the post is a ditto '''
 
-                ditto_emoji = discord.utils.get(reaction.message.server.emojis, name="ditto")
+                ditto_emoji = discord.utils.get(reaction.message.guild.emojis, name="ditto")
                 ditto_emoji=(str(ditto_emoji)[1:8])
                 return ditto_emoji == ':ditto:'
 
