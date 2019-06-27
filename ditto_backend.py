@@ -16,13 +16,6 @@ def get_user_dir_path(user_id):
 		return os.path.join(USERDIRS, str(user_id))
 	else:
 		print("Cannot find user dir.. making one")
-<<<<<<< HEAD
-		create_user_dir(user_id)
-		return False
-
-def create_user_dir(dir_name):
-	print("Created directory for {user_id}".format(dir_name))
-=======
 		return create_user_dir(os.path.join(USERDIRS, str(user_id)))
 
 def create_user_dir(path):
@@ -65,4 +58,3 @@ def get_random_image(user_id, lib_name):
 
 def get_lib_image(user_id, lib_name, img_name):
 	pass
->>>>>>> origin/drey
