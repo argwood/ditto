@@ -34,8 +34,7 @@ class Ditto:
         """
 
         ditto_emoji = discord.utils.get(reaction.message.server.emojis, name="ditto")
-        ditto_emoji=(str(ditto_emoji)[1:8])
-        print(reaction)
+        ditto_emoji=(str(reaction.emoji)[1:8])
         return ditto_emoji == ':ditto:'
 
     def start_query(self, command, author_id, file_url):
@@ -70,13 +69,12 @@ class Ditto:
             lib = response.content.strip()
             await self.add_to_library(message, lib)
         else:
-            await self._client.send_message(message.channel, 'That library doesn\'t exist. Use `$newLibrary <library name>` to create a new library.')
-            response = await self._client.wait_for_message(author=message.author)
             lib = response.content.strip()
-            if lib in libs:
-                await self.add_to_library(message, lib)
-            else:
-                await self.new_library(response)
+            await self._client.send_message(message.channel, 'That library doesn\'t exist. Would you like to create it?')
+            yesmessage = await self._client.wait_for_message(author=message.author)
+            if yesmessage.content.lower().strip() == 'yes':
+                ditto_backend.create_lib(message.author.id, lib)
+                await self._client.send_message(message.channel, ('New library `' + lib +'` has been created for `{}`'.format(message.author.display_name)))
 
 
     async def new_library(self, message):
@@ -98,11 +96,15 @@ class Ditto:
                 response = await self._client.wait_for_message(author=message.author)
                 if '$stop' not in response.content:
                     await self.new_library(response)
+                else:
+                    await self._client.send_message(message.channel, 'This file has not been saved.')
         else:
             await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>` or type `$stop` to cancel.'))
             response = await self._client.wait_for_message(author=message.author)
             if '$stop' not in response.content:
                 await self.new_library(response)
+            else:
+                await self._client.send_message(message.channel, 'This file has not been saved.')
 
     async def delete_library(self, message):
         """
