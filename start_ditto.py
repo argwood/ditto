@@ -26,6 +26,10 @@ async def on_ready():
 async def on_message(message):
     if message.content.startswith('$Library'): # just a basic test to be used to see if bot is on
         await _ditto.share_library(message)
+    elif message.content.startswith('$deleteLibrary'):
+        await _ditto.delete_library(message)
+    elif message.content.startswith('$myLibraries'):
+        await _ditto.list_libraries(message)
     elif message.content.startswith('$help'):
         await _ditto.help_msg(message)
 
@@ -37,7 +41,7 @@ async def on_reaction_add(reaction, user): # it's probably smarter to wait_for(d
     if _ditto.check_file_type(reaction.message):
         #await client.send_message(message.channel, 'Great, that\'s a supported file type!')
         if _ditto.check_for_ditto_react(reaction):
-            await _ditto.prompt_user(message)
+            await _ditto.on_ditto_react(message)
             #await client.send_message(message.channel, 'You even used the right reaction!') # passed the reaction tests; here you would actually call library functions
             #await client.send_message(message.channel, 'Your ID is {}'.format(message.author.id))
             #await client.send_message(message.channel, 'Your file address is {}'.format(message.attachments[0].get("url")))

@@ -26,8 +26,9 @@ class Ditto:
 
                 pass
 
-        async def prompt_user(self, message):
+        async def on_ditto_react(self, message):
                 ''' Start here if user reacts :ditto: on a file '''
+                #libs = ditto_backend.get_user_libs(message.author.id)
 
                 self.start_query('get_user_libs', message.author.id, message.attachments[0].get("url"))
                 libs = ['Dog Memes', 'Food'] # placeholder - this will be what the query returns
@@ -67,15 +68,34 @@ class Ditto:
                     if response.content.startswith('$newLibrary'):
                         await self.new_library(message, response)
 
+        async def delete_library(self, message):
+                ''' $deleteLibrary - Delete an entire library for a user '''
+
+                if len(message.content.split()) > 1:
+                    lib_to_del = message.content.split(' ', 1)[1]
+                    if self.check_for_library(message.author.id, lib_to_del):
+                        await self._client.send_message(message.channel, ('Are you sure you want to delete the entire library `{}`? Type `yes` to delete'.format(lib_to_del)))
+                        response = await self._client.wait_for_message(author=message.author)
+                        if response.content.lower().strip() == 'yes':
+                            self.start_query('delete_lib', message.author.id, lib_to_del)
+                            await self._client.send_message(message.channel, ('Library `{}` has been deleted.'.format(lib_to_del)))
+                    else:
+                        await self._client.send_message(message.channel, 'That library does not exist.')
+
+                else:
+                    await self._client.send_message(message.channel, ('Please provide a name for the library you want to delete using `$deleteLibrary <library name>`.'))
+
         async def add_to_library(self, message, response):
                 ''' Add file to existing library '''
                 lib = response.content
                 self.start_query('add_to_lib', message.author.id, message.attachments[0].get("url")) # send lib here too
                 await self._client.send_message(message.channel, 'File added to library `' + lib +'`!')
 
-        def check_for_library(self):
+        def check_for_library(self, user, lib):
                 ''' Check if user response for library option is valid'''
-                pass
+                self.start_query('get_user_libs', user, '')
+                user_libs = ['Dog Memes', 'Food'] #placeholder for output of query
+                return lib in user_libs
 
         async def share_library(self, message):
                 ''' $Library <library name> - Returns a library to message channel where left and right arrows can flip through files'''
@@ -89,6 +109,20 @@ class Ditto:
                     if message.content.startswith('$Library'):
                         await self.share_library(message)
 
+        async def list_libraries(self, message):
+                ''' $myLibraries - Returns a list of your current libraries '''
+
+                self.start_query('get_user_libs', message.author.id, '')
+                libs = ['Dog Memes', 'Food'] #placeholder for output of query
+
+                title = message.author.display_name + '\'s Libraries'
+                desc = ''
+                for index, lib in enumerate(libs):
+                    desc += '{}. {}\n'.format(index+1, lib)
+                em = discord.Embed(description=desc, title = title, color = self.blurple)
+
+                await self._client.send_message(message.channel, embed = em)
+
         def surprise(self):
                 ''' $surpriseMe - Returns a randomly chosen photo '''
                 pass
@@ -99,7 +133,9 @@ class Ditto:
                 await self._client.send_message(message.channel, 'Hey I\'m Ditto, your media squire for Discord! Here\'s some things I can do for you:')
                 em = discord.Embed(color = self.blurple)
                 em.add_field(name = ':ditto:', value = 'React to a file with `:ditto:` to save it to a library', inline=False)
+                em.add_field(name = '$myLibraries', value = 'View a list of your current libraries', inline=False)
                 em.add_field(name = '$Library <library name>', value = 'View a library', inline=False)
+                em.add_field(name = '$deleteLibrary <library name>', value = 'Delete a library', inline=False)
                 em.add_field(name = '$surpriseMe', value = 'Pick a photo at random', inline=False)
                 await self._client.send_message(message.channel, embed=em)
 
