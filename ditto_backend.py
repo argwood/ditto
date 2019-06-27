@@ -1,4 +1,5 @@
 import os, requests, shutil
+import random
 USERDIRS = "./user_directories"
 
 
@@ -76,7 +77,11 @@ def add_img_to_lib(user_id, lib_name, img_name, attachment_url):
 
 	
 def get_random_image(user_id, lib_name):
-	pass
+	file_name = ""
+	for root, _, files in os.walk(os.path.join(USERDIRS, str(user_id), lib_name)):
+		file_name = os.path.join(root, random.choice(files))
+	return file_name
+
 
 def get_lib_image(user_id, lib_name, img_name):
 	"""
