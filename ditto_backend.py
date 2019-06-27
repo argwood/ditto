@@ -1,4 +1,4 @@
-import os, requests
+import os, requests, shutil
 USERDIRS = "./user_directories"
 
 
@@ -51,10 +51,49 @@ def create_lib(user_id, lib_name):
 		return "Success!"
 
 def add_img_to_lib(user_id, lib_name, img_name, attachment_url):
-	pass
+	"""
+	Usage: Downloads content from an given url and saves it to the path ./user_directories/user_id/lib_name/img_name
 
+	Parameters:
+		user_id (str or int): the unique token for each user provided by discord.py
+		lib_name (str): the name of the library the user wishes to save the image to
+		img_name (str): the name of the image the user wishes to save the file under
+		attachment_url (str): the url to the discord media attachment
+	
+	Returns:
+		bool result: True if successful, False if failed
+	"""
+	user_id = str(user_id)
+	file_name = os.path.join(USERDIRS, user_id, lib_name, "{}.jpg".format(img_name))
+	req = requests.get(attachment_url, stream=True)
+	if req.status_code == 200:
+		with open(file_name, 'wb') as f:
+			req.raw.decode_content = True
+			shutil.copyfileobj(req.raw, f)
+		return True
+	else:
+		return False
+
+	
 def get_random_image(user_id, lib_name):
 	pass
 
 def get_lib_image(user_id, lib_name, img_name):
-	pass
+	"""
+	Usage: Retrieve a direct path to the media requested by user
+
+	Parameters:
+		user_id (str or int): the unique token for each user provided by discord.py
+		lib_name (str): the name of the library the user wishes to save the image to
+		img_name (str): the name of the image the user wishes to save the file under
+
+	Returns:
+		if successful | file_path (str): the direct filepath to the image 
+		else | error_message (str)
+
+	"""
+	file_path = os.path.join(USERDIRS, str(user_id), lib_name, img_name + ".jpg")
+	if os.path.exists(file_path) and os.path.isfile(file_path):
+		return file_path
+	else:
+		return ("Image {} does not exist.".format(img_name))
