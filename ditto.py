@@ -123,11 +123,14 @@ class Ditto:
         if len(message.content.split()) > 1:
             lib_to_del = message.content.split(' ', 1)[1]
             if self.check_for_library(message.author.id, lib_to_del):
-                await self._client.send_message(message.channel, ('Are you sure you want to delete the entire library `{}`? Type `yes` to delete'.format(lib_to_del)))
+                await self._client.send_message(message.channel, ('Are you sure you want to delete the entire library `{}`? Type `yes` to delete.'.format(lib_to_del)))
                 response = await self._client.wait_for_message(author=message.author)
                 if response.content.lower().strip() == 'yes':
-                    self.start_query('delete_lib', message.author.id, lib_to_del)
-                    await self._client.send_message(message.channel, ('Library `{}` has been deleted.'.format(lib_to_del)))
+                    success = ditto_backend.remove_lib(message.author.id, lib_to_del)
+                    if success:
+                        await self._client.send_message(message.channel, ('Library `{}` has been deleted.'.format(lib_to_del)))
+                    else:
+                        await self._client.send_message(message.channel, 'Sorry, that library could\'t be deleted.')
             else:
                 await self._client.send_message(message.channel, 'That library does not exist.')
 
@@ -172,12 +175,31 @@ class Ditto:
 
         if len(message.content.split()) > 1:
             lib = message.content.split(' ', 1)[1]
-            img_url = ditto_backend.get_lib_image(message.author.id, 'ditto', 'ditto.jpg')
-            await self._client.send_message(message.channel, 'Here is a placeholder that will be your library')
-            msg = await self._client.send_file(message.channel, img_url)
-            #left_arrow = self._client.get_emoji
+            imgs = ditto_backend.get_lib_images(message.author.id, lib)
+            n_imgs = len(imgs)
+            n=0
+            img0 = ditto_backend.get_lib_image(message.author.id, lib, imgs[0])
+            await self._client.send_message(message.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib, message.author.display_name, n+1, n_imgs))
+            msg = await self._client.send_file(message.channel, img0)
+
+            #desc = '{} Photos Tagged "{}" by {}'.format(n_imgs, lib, message.author.display_name)
+            #em = discord.Embed(description=desc, title = lib, color = self.blurple)
+            #em.set_image(url = 'attachment://' + img0)
+            #await self._client.send_message(message.channel, embed=em)
+            #await self._client.http.send_file(message.channel, img0, embed=em.to_dict())
+
             await self._client.add_reaction(msg, '\u2B05') # left arrow
             await self._client.add_reaction(msg, '\u27A1') # right arrow
+            await self._client.add_reaction(msg, '\u274C') # X
+            user_reaction = await self._client.wait_for_reaction(['\u2B05', '\u27A1','\u274C'], user=message.author, message=msg)
+            await self._client.send_message(message.channel, 'you reacted ' + str(user_reaction.reaction.emoji))
+            if user_reaction.reaction.emoji == '\u2B05':
+                print('left arrow!')
+            elif user_reaction.reaction.emoji == '\u27A1':
+                print('right arrow!')
+            elif user_reaction.reaction.emoji == '\u274C':
+                print('delete!')
+
         else:
             await self._client.send_message(message.channel, ('Please provide a library name using `$Library <library name>`'))
 
