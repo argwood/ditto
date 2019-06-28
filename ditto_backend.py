@@ -26,7 +26,7 @@ def create_user_dir(path):
 	Parameters:
 		path (str): a string that includes a unique user id e.g.: ./user-directors/user_id
 
-	Returns:	
+	Returns:
 		path (str): a string that includes a unique user id e.g.: ./user-directors/user_id
 	"""
 	try:
@@ -34,16 +34,16 @@ def create_user_dir(path):
 	except OSError:
 		print("Failed to create User Directory with " + path)
 	else:
-		print("Created directory {path_to_dir}".format(path_to_dir=path)) 
+		print("Created directory {path_to_dir}".format(path_to_dir=path))
 	return path
 
 def get_user_libs(user_id):
 	"""
 	Usage: get all libraries for a specific user
-	
+
 	Parameters:
 		user_id (int or string): the unique token for each user provided by discord.py
-	
+
 	Returns:
 		libs (str): a list of all libraries
 	"""
@@ -54,11 +54,11 @@ def get_user_libs(user_id):
 def get_lib_images(user_id, lib_name):
 	"""
 	Usage: get all images for a specific library of a user
-	
+
 	Parameters:
 		user_id (int or string): the unique token for each user provided by discord.py
 		lib_name (str): the name of the library the user wishes to save the image to
-	
+
 	Returns:
 		images (str): a list of all images
 	"""
@@ -84,12 +84,12 @@ def add_img_to_lib(user_id, lib_name, img_name, attachment_url):
 		lib_name (str): the name of the library the user wishes to save the image to
 		img_name (str): the name of the image the user wishes to save the file under
 		attachment_url (str): the url to the discord media attachment
-	
+
 	Returns:
 		bool result: True if successful, False if failed
 	"""
 	user_id = str(user_id)
-	file_name = os.path.join(USERDIRS, user_id, lib_name, "{}.jpg".format(img_name))
+	file_name = os.path.join(USERDIRS, user_id, lib_name, img_name)
 	req = requests.get(attachment_url, stream=True)
 	if req.status_code == 200:
 		with open(file_name, 'wb') as f:
@@ -99,7 +99,7 @@ def add_img_to_lib(user_id, lib_name, img_name, attachment_url):
 	else:
 		return False
 
-	
+
 def get_random_image(user_id, lib_name):
 	file_name = ""
 	for root, _, files in os.walk(os.path.join(USERDIRS, str(user_id), lib_name)):
@@ -117,11 +117,11 @@ def get_lib_image(user_id, lib_name, img_name):
 		img_name (str): the name of the image the user wishes to save the file under
 
 	Returns:
-		if successful | file_path (str): the direct filepath to the image 
+		if successful | file_path (str): the direct filepath to the image
 		else | error_message (str)
 
 	"""
-	file_path = os.path.join(USERDIRS, str(user_id), lib_name, img_name + ".jpg")
+	file_path = os.path.join(USERDIRS, str(user_id), lib_name, img_name)
 	if os.path.exists(file_path) and os.path.isfile(file_path):
 		return file_path
 	else:

@@ -67,7 +67,7 @@ class Ditto:
             await self.new_library(response, message.attachments[0])
         elif response.content in libs:
             lib = response.content.strip()
-            await self.add_to_library(message, lib)
+            await self.add_to_library(message, message.attachments[0], lib)
         else:
             lib = response.content.strip()
             await self._client.send_message(message.channel, 'That library doesn\'t exist. Would you like to create it?')
@@ -89,9 +89,14 @@ class Ditto:
         if message.content.startswith('$newLibrary'):
             if len(message.content.split()) > 1:
                 new_lib = message.content.split(' ', 1)[1]
-                ditto_backend.create_lib(message.author.id, new_lib)
-                await self.add_to_library(message, img, new_lib)
-                await self._client.send_message(message.channel, ('New library `' + new_lib +'` has been created for `{}`'.format(message.author.display_name)))
+                if not self.check_for_library(message.author.id, new_lib):
+                    ditto_backend.create_lib(message.author.id, new_lib)
+                    await self.add_to_library(message, img, new_lib)
+                    await self._client.send_message(message.channel, ('New library `' + new_lib +'` has been created for `{}`'.format(message.author.display_name)))
+                else:
+                    await self._client.send_message(message.channel, ('That library already exists. Adding the file to it anyways.'))
+                    await self.add_to_library(message, img, new_lib)
+
             else:
                 await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>` or type `$stop` to cancel.'))
                 response = await self._client.wait_for_message(author=message.author)
@@ -135,6 +140,7 @@ class Ditto:
 
         Parameters:
             message (Discord.py message object): the message that contains the file
+			img (Discord.py attachment object): the attachment/ file that you want to save
             lib (str): library name to add file to
         """
         ditto_backend.add_img_to_lib(message.author.id, lib, img.get("filename"), img.get("url"))
@@ -189,8 +195,9 @@ class Ditto:
         desc = ''
         for index, lib in enumerate(libs):
             desc += '{}. {}\n'.format(index+1, lib)
+        if len(libs) == 0:
+            desc+='You don\'t have any libraries yet! React with `:ditto:` to an image to begin!'
         em = discord.Embed(description=desc, title = title, color = self.blurple)
-
         await self._client.send_message(message.channel, embed = em)
 
     async def surprise(self, message):
@@ -205,23 +212,16 @@ class Ditto:
         if len(message.content.split()) > 1:
             lib = message.content.split(' ', 1)[1]
             if lib in user_libs:
-                ditto_backend.get_random_image(message.author.id, lib)
-
-                await self._client.send_message(message.channel, ('Here\'s a random image from the library `{}`'.format(lib)))
+                random_img = ditto_backend.get_random_image(message.author.id, lib)
+                filename = random_img.split('/')[-1]
+                img_url = ditto_backend.get_lib_image(message.author.id, lib, filename)
+                await self._client.send_message(message.channel, ('Here\'s a random image from the library `{}`.'.format(lib)))
+                await self._client.send_file(message.channel, img_url)
             else:
-                await self._client.send_message(message.channel, ('Library not found.  Here\'s a random image instead!'))
-                lib_rand = random.randint(0, len(user_libs)-1)
-                ditto_backend.get_random_image(message.author.id, lib_rand)
+                await self._client.send_message(message.channel, ('Library not found. Use `$surpriseMe <library name>` to get a random photo from that library.'))
 
         else:
-            lib_rand = random.randint(0, len(user_libs)-1)
-            ditto_backend.get_random_image(message.author.id, lib_rand)
-            img_url = ditto_backend.get_lib_image(message.author.id, 'ditto', 'ditto.jpg')
-            print(img_url)
-            await self._client.send_message(message.channel, ('Here\'s a random image from the library `{}`'.format(user_libs[lib_rand])))
-            await self._client.send_file(message.channel, img_url)
-
-
+            await self._client.send_message(message.channel, ('Use `$surpriseMe <library name>` to get a random photo from that library.'))
 
     async def help_msg(self, message):
         """
