@@ -37,11 +37,11 @@ async def on_message(message):
 
 
 @client.event
-async def on_reaction_add(reaction, user): # it's probably smarter to wait_for(ditto_react) instead of check any time someone reacts on an image - TBD but this works for now
+async def on_reaction_add(reaction, user):
     message = reaction.message
     if _ditto.check_file_type(reaction.message):
         if _ditto.check_for_ditto_react(reaction):
-            await _ditto.on_ditto_react(message)
+            await _ditto.on_ditto_react(message, user)
 
 if __name__ == "__main__":
 

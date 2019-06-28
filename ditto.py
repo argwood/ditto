@@ -42,7 +42,7 @@ class Ditto:
 
         pass
 
-    async def on_ditto_react(self, message):
+    async def on_ditto_react(self, message, user):
         """
         Usage: When a user reacts to a file with :ditto:, get (or create) the user's directory path,
         and save file to a library or create a new library based on user response
@@ -50,19 +50,18 @@ class Ditto:
         Parameters:
             message (Discord.py message object)
         """
-
-        user_path = ditto_backend.get_user_dir_path(message.author.id)
-        libs = ditto_backend.get_user_libs(message.author.id)
-        title = message.author.display_name + '\'s Libraries'
+        user_path = ditto_backend.get_user_dir_path(user.id)
+        libs = ditto_backend.get_user_libs(user.id)
+        title = user.display_name + '\'s Libraries'
         desc = ''
         for index, lib in enumerate(libs):
             desc += '{}. {}\n'.format(index+1, lib)
         desc += '**$newLibrary** <library name>'
         em = discord.Embed(description=desc, title = title, color = self.blurple)
 
-        await self._client.send_message(message.channel, ('`{}`, what library do you want to save this file in?'.format(message.author.display_name)))
+        await self._client.send_message(message.channel, ('`{}`, what library do you want to save this file in?'.format(user.display_name)))
         await self._client.send_message(message.channel, embed = em)
-        response = await self._client.wait_for_message(author=message.author)
+        response = await self._client.wait_for_message(author=user)
         if '$newLibrary' in response.content:
             await self.new_library(response, message.attachments[0])
         elif response.content in libs:
@@ -71,11 +70,10 @@ class Ditto:
         else:
             lib = response.content.strip()
             await self._client.send_message(message.channel, 'That library doesn\'t exist. Would you like to create it?')
-            yesmessage = await self._client.wait_for_message(author=message.author)
+            yesmessage = await self._client.wait_for_message(author=user)
             if yesmessage.content.lower().strip() == 'yes':
-                ditto_backend.create_lib(message.author.id, lib)
-                await self._client.send_message(message.channel, ('New library `' + lib +'` has been created for `{}`'.format(message.author.display_name)))
-
+                ditto_backend.create_lib(user.id, lib)
+                await self._client.send_message(message.channel, ('New library `' + lib +'` has been created for `{}`'.format(user.display_name)))
 
     async def new_library(self, message, img):
         """
@@ -352,6 +350,6 @@ class Ditto:
         em.add_field(name = '$Library <library name>', value = 'View a library', inline=False)
         em.add_field(name = '$deleteLibrary <library name>', value = 'Delete a library', inline=False)
         em.add_field(name = '$surpriseMe <library name>', value = 'Pick a photo from a library at random', inline=False)
-        em.set_thumbnail(url='http://localhost/ditto-bot-monogram.png')
+        em.set_thumbnail(url= 'https://github.com/ditto-dev-team/ditto/blob/argon/ditto-bot-monogram.png?raw=true')
         await self._client.send_message(message.channel, embed=em)
 
