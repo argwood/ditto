@@ -3,24 +3,21 @@ import discord
 import asyncio
 import ditto
 
-
-
 '''
 ditto: your media squire for Discord
 
 usage: python3 start_ditto.py
 '''
 
-
 client = discord.Client()
 
 token = os.environ['TOKEN']
 
 _ditto = ditto.Ditto(client)
-print(discord.__version__)
 @client.event
 async def on_ready():
-    print('Improving your Discord multimedia experience...') # maybe Kevin can come up with a clever message to print when the bot wakes up
+    print('Improving your Discord media experience...')
+    print('Currently running on Discord.py version {}. Ditto runs best on version 0.16.12.'.format(discord.__version__))
 
 @client.event
 async def on_message(message):
@@ -34,7 +31,6 @@ async def on_message(message):
         await _ditto.surprise(message)
     elif message.content.startswith('$help'):
         await _ditto.help_msg(message)
-
 
 @client.event
 async def on_reaction_add(reaction, user):

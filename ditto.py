@@ -1,7 +1,6 @@
 import discord
 import asyncio
 import ditto_backend
-import random
 
 class Ditto:
 
@@ -14,7 +13,7 @@ class Ditto:
         Usage: Determines if a message includes a file
 
         Parameters:
-            message (Discord.py message object)
+            message (Discord.py message)
 
         Returns:
             True if message includes a file; False otherwise
@@ -27,7 +26,7 @@ class Ditto:
         Usage: Checks if the reaction to a post with an attachment is :ditto:
 
         Parameters:
-            reaction (Discord.py reaction object)
+            reaction (Discord.py reaction)
 
         Returns:
             True if the reaction is :ditto:; False otherwise
@@ -37,19 +36,16 @@ class Ditto:
         ditto_emoji=(str(reaction.emoji)[1:8])
         return ditto_emoji == ':ditto:'
 
-    def start_query(self, command, author_id, file_url):
-        ''' Placeholder method for Drey code '''
-
-        pass
-
     async def on_ditto_react(self, message, user):
         """
         Usage: When a user reacts to a file with :ditto:, get (or create) the user's directory path,
         and save file to a library or create a new library based on user response
 
         Parameters:
-            message (Discord.py message object)
+			message (Discord.py message): the message that contains the file
+			user (Discord.py user): the person who reacted to the message
         """
+
         user_path = ditto_backend.get_user_dir_path(user.id)
         libs = ditto_backend.get_user_libs(user.id)
         title = user.display_name + '\'s Libraries'
@@ -81,10 +77,12 @@ class Ditto:
         Creates a library if so, otherwise prompts for a library name
 
         Parameters:
-            message (Discord.py message object)
+			message (Discord.py message): the user response that contains the library name
+			img (dict): the attachment (file) the user wants to save
         """
 
         if message.content.startswith('$newLibrary'):
+            print(type(message))
             if len(message.content.split()) > 1:
                 new_lib = message.content.split(None, 1)[1]
                 if not self.check_for_library(message.author.id, new_lib):
@@ -115,7 +113,7 @@ class Ditto:
         Usage: Upon user command `$deleteLibrary` and confirmation, deletes an entire library
 
         Parameters:
-            message (Discord.py message object)
+            message (Discord.py message)
         """
 
         if len(message.content.split()) > 1:
@@ -131,7 +129,6 @@ class Ditto:
                         await self._client.send_message(message.channel, 'Sorry, that library could\'t be deleted.')
             else:
                 await self._client.send_message(message.channel, 'That library does not exist.')
-
         else:
             await self._client.send_message(message.channel, ('Please provide a name for the library you want to delete using `$deleteLibrary <library name>`.'))
 
@@ -140,8 +137,8 @@ class Ditto:
         Usage: Adds the file the user reacted to to an existing library
 
         Parameters:
-            message (Discord.py message object): the message that contains the file
-			img (Discord.py attachment object): the attachment/ file that you want to save
+            message (Discord.py message): the message that contains the file
+			img (dict): the attachment/ file that you want to save
             lib (str): library name to add file to
         """
         ditto_backend.add_img_to_lib(message.author.id, lib, img.get("filename"), img.get("url"))
@@ -163,6 +160,16 @@ class Ditto:
         return lib in user_libs
 
     def check_if_img(self, fname):
+        """
+        Usage: Checks if the file has an image extention
+
+        Parameters:
+            fname (str): the name of the file (with extension)
+
+        Returns:
+            True if the file has a supported image extension
+        """
+
         extension = fname.split('.')[-1]
         return extension.lower() in ['png', 'jpg', 'jpeg', 'gif', 'tiff']
 
@@ -172,7 +179,7 @@ class Ditto:
         Left and right arrow reactions allow the user to flip through files
 
         Parameters:
-            message (Discord.py message object)
+            message (Discord.py message)
         """
 
         if len(message.content.split()) > 1:
@@ -184,8 +191,6 @@ class Ditto:
                 for i, f in enumerate(imgs):
                     if not self.check_if_img(imgs[i]):
                         n_imgs-=1
-
-                    extension = imgs[i].split('.')[-1]
                 n=0
                 if n_files == 0:
                     msg = await self._client.send_message(message.channel, 'The library `{}` appears to be empty!'.format(lib))
@@ -211,13 +216,6 @@ class Ditto:
                     msg = await self._client.send_message(message.channel, '{} Photos and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, message.author.display_name, n+1, n_files))
                     img_msg = await self._client.send_file(message.channel, img0)
 
-
-                #desc = '{} Photos Tagged "{}" by {}'.format(n_imgs, lib, message.author.display_name)
-                #em = discord.Embed(description=desc, title = lib, color = self.blurple)
-                #em.set_image(url = 'attachment://' + img0)
-                #await self._client.send_message(message.channel, embed=em)
-                #await self._client.http.send_file(message.channel, img0, embed=em.to_dict())
-
                 await self._client.add_reaction(img_msg, '\u2B05') # left arrow
                 await self._client.add_reaction(img_msg, '\u27A1') # right arrow
                 await self._client.add_reaction(img_msg, '\u274C') # X
@@ -229,6 +227,18 @@ class Ditto:
             await self._client.send_message(message.channel, ('Please provide a library name using `$Library <library name>`'))
 
     async def next_img_or_del(self, msg, img_msg, author, lib, n, imgs, n_imgs):
+        """
+		Usage: Cycles through files in a library when user reacts with the appropriate reactions, and deletes them when user reacts with :x:
+
+		Parameters:
+		    msg (Discord.py message): the message (library title) from ditto prior to image post
+			img_msg (Discord.py message): the message from ditto that contains the image
+			author (Discord.py user): the user who owns the library
+			lib (str): library name
+			n (int): pointer to current position in the library
+			imgs (list): list of filenames in the library
+			n_imgs (int): number of files in the library that are images
+		"""
 
         n_files = len(imgs)
         user_reaction = await self._client.wait_for_reaction(['\u2B05', '\u27A1','\u274C'], user=author, message=img_msg)
@@ -299,7 +309,7 @@ class Ditto:
         Usage: Upon user command `$myLibraries`, returns a list of the users current libraries to message channel
 
         Parameters:
-            message (Discord.py message object)
+            message (Discord.py message)
         """
 
         libs = ditto_backend.get_user_libs(message.author.id)
@@ -315,11 +325,12 @@ class Ditto:
 
     async def surprise(self, message):
         """
-        Usage: Upon user command `$surpriseMe`, returns a randomly chosen photo from any of the user's libraries to message channel
+        Usage: Upon user command `$surpriseMe`, returns a randomly chosen photo from the library provided by the user
 
         Parameters:
-            message (Discord.py message object)
+            message (Discord.py message)
         """
+
         user_libs = ditto_backend.get_user_libs(message.author.id)
 
         if len(message.content.split()) > 1:
@@ -340,7 +351,7 @@ class Ditto:
         """
         Usage: Upon user command `$help`, returns a help message with bot functionality to message channel
 
-        Parameters: message (Discord.py message object)
+        Parameters: message (Discord.py message)
         """
 
         await self._client.send_message(message.channel, 'Hey I\'m Ditto, your media squire for Discord! Here\'s some things I can do for you:')
@@ -350,6 +361,6 @@ class Ditto:
         em.add_field(name = '$Library <library name>', value = 'View a library', inline=False)
         em.add_field(name = '$deleteLibrary <library name>', value = 'Delete a library', inline=False)
         em.add_field(name = '$surpriseMe <library name>', value = 'Pick a photo from a library at random', inline=False)
-        em.set_thumbnail(url= 'https://github.com/ditto-dev-team/ditto/blob/argon/ditto-bot-monogram.png?raw=true')
+        em.set_thumbnail(url= 'https://github.com/ditto-dev-team/ditto/blob/master/ditto-bot-monogram.png?raw=true')
         await self._client.send_message(message.channel, embed=em)
 
