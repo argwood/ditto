@@ -38,9 +38,33 @@ def create_user_dir(path):
 	return path
 
 def get_user_libs(user_id):
+	"""
+	Usage: get all libraries for a specific user
+	
+	Parameters:
+		user_id (int or string): the unique token for each user provided by discord.py
+	
+	Returns:
+		libs (str): a list of all libraries
+	"""
 	user_dir_path = get_user_dir_path(user_id)
 	libs = [name for subdir, dirs, _ in os.walk(user_dir_path, topdown=False) for name in dirs]
 	return libs
+
+def get_lib_images(user_id, lib_name):
+	"""
+	Usage: get all images for a specific library of a user
+	
+	Parameters:
+		user_id (int or string): the unique token for each user provided by discord.py
+		lib_name (str): the name of the library the user wishes to save the image to
+	
+	Returns:
+		images (str): a list of all images
+	"""
+	lib_path = os.path.join(get_user_dir_path(user_id), lib_name)
+	images = [name for subdir, _, files in os.walk(lib_path, topdown=False) for name in files]
+	return images
 
 def create_lib(user_id, lib_name):
 	try:
@@ -102,3 +126,44 @@ def get_lib_image(user_id, lib_name, img_name):
 		return file_path
 	else:
 		return ("Image {} does not exist.".format(img_name))
+
+def remove_image(user_id, lib_name, img_name):
+	"""
+	Usage: Remove an image from a library
+
+	Parameters:
+		user_id (str or int): the unique token for each user provided by discord.py
+		lib_name (str): the name of the library the user wishes to remove from
+		img_name (str): the name of the image the user wishes to remove
+
+	Returns:
+		if successful | True
+		else | False
+
+	"""
+	file_path = get_lib_image(user_id, lib_name, img_name)
+	if file_path:
+		os.remove(file_path)
+		return True
+	else:
+		return False
+
+def remove_lib(user_id, lib_name):
+	"""
+	Usage: Remove an image from a library
+
+	Parameters:
+		user_id (str or int): the unique token for each user provided by discord.py
+		lib_name (str): the name of the library the user wishes to remove from
+
+	Returns:
+		if successful | True
+		else | False
+
+	"""
+	dir_path = os.path.join(get_user_dir_path(user_id), lib_name)
+	if os.path.isdir(dir_path) and os.path.exists(dir_path):
+		shutil.rmtree(dir_path)
+		return True
+	else:
+		return False

@@ -36,9 +36,18 @@ print(ditto_backend.add_img_to_lib(3, "dogs", "d4", "https://cdn.discordapp.com/
 print(ditto_backend.add_img_to_lib(4, "dogs", "d1", "https://cdn.discordapp.com/attachments/592776695069671424/593794343568015382/0.jpeg"))
 
 
+print("Testing library images")
+print(ditto_backend.get_lib_images(3,"dogs"))
+
 print("Testing successful media retrieval")
 print(ditto_backend.get_lib_image(1, "dogs", "d1"))
 
 print("Testing random")
 print(ditto_backend.get_random_image(1, "dogs"))
 print(ditto_backend.get_random_image(3, "dogs"))
+
+print("Testing image remove")
+print(ditto_backend.remove_image(1, "dogs", "d1"))
+
+print("Testing library remove")
+print(ditto_backend.remove_lib(3, "dogs"))
