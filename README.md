@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="">
-    <img alt="ditto" src="https://kevinchisaki.github.io/ditto-site/img/ditto-bot-monogram.svg" width="80px" />
+  <a href="http://www.dittobot.fyi/" target="_blank">
+    <img alt="ditto" src="http://www.dittobot.fyi/img/ditto-bot-monogram.svg" width="80px" />
   </a>
 </p>
 
@@ -25,8 +25,13 @@
 ## What does ditto do?
 
 * Ditto organizes your media files into libraries.
-* Tags photos & files and stores them.
+* Tags your photos or files and stores them.
 * Shares your libraries with everyone in your server.
+
+## Interested in learning more?
+* [Invite the bot](https://discordapp.com/oauth2/authorize?&client_id=592793989682429975&scope=bot&permissions=8) to your server
+* Join our [test server](https://discord.gg/zMRRVqu)
+* Visit our [website](http://www.dittobot.fyi/)
 
 ## Ditto Commands
 
@@ -56,15 +61,10 @@ Reference a library with `$Library <library name>` and share with your friends!
 
 This command will delete an entire library. Ditto will ask for confirmation just to be sure.
 
-### :game_die: Random Photo
+## Future Features
 
-#### `$surpriseMe`
-
-Ditto can randomly post a photo with `$surpriseMe` for the whole server to enjoy!
-
-#### `$surpriseMe <library name>`
-
-Ditto can also spit out a random photo in a specific library to share.
+* Reference a random photo function
+* Adding Links & Google Docs to Libraries
 
 ## Credits
 
