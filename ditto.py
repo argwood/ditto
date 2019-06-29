@@ -202,6 +202,12 @@ class Ditto:
                 elif n_files == n_imgs and n_imgs > 1:
                     msg = await self._client.send_message(message.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), message.author.display_name, n+1, n_files))
                     img_msg = await self._client.send_file(message.channel, img0)
+                elif n_files == 1 and n_imgs == 0:
+                    msg = await self._client.send_message(message.channel, '{} File Tagged "{}" by {} ({}/{})'.format(n_files, lib.capitalize(), message.author.display_name, n+1, n_files))
+                    img_msg = await self._client.send_file(message.channel, img0)
+                elif n_files > 1 and n_imgs == 0:
+                    msg = await self._client.send_message(message.channel, '{} Files Tagged "{}" by {} ({}/{})'.format(n_files, lib.capitalize(), message.author.display_name, n+1, n_files))
+                    img_msg = await self._client.send_file(message.channel, img0)
                 elif n_files == 2 and n_imgs == 1:
                     msg = await self._client.send_message(message.channel, '{} Photo and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), message.author.display_name, n+1, n_files))
                     img_msg = await self._client.send_file(message.channel, img0)
@@ -253,6 +259,10 @@ class Ditto:
                 msg = await self._client.send_message(msg.channel, '{} Photo Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files == n_imgs and n_imgs > 1:
                 msg = await self._client.send_message(msg.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
+            elif n_files == 1 and n_imgs == 0:
+                msg = await self._client.send_message(msg.channel, '{} File Tagged "{}" by {} ({}/{})'.format(n_files, lib.capitalize(), author.display_name, n+1, n_files))
+            elif n_files > 1 and n_imgs == 0:
+                msg = await self._client.send_message(msg.channel, '{} Files Tagged "{}" by {} ({}/{})'.format(n_files, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files == 2 and n_imgs == 1:
                 msg = await self._client.send_message(msg.channel, '{} Photo and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files > 2 and n_imgs == 1:
@@ -279,6 +289,10 @@ class Ditto:
                 msg = await self._client.send_message(msg.channel, '{} Photo Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files == n_imgs and n_imgs > 1:
                 msg = await self._client.send_message(msg.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
+            elif n_files == 1 and n_imgs == 0:
+                msg = await self._client.send_message(msg.channel, '{} File Tagged "{}" by {} ({}/{})'.format(n_files, lib.capitalize(), author.display_name, n+1, n_files))
+            elif n_files > 1 and n_imgs == 0:
+                msg = await self._client.send_message(msg.channel, '{} Files Tagged "{}" by {} ({}/{})'.format(n_files, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files == 2 and n_imgs == 1:
                 msg = await self._client.send_message(msg.channel, '{} Photo and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files > 2 and n_imgs == 1:
