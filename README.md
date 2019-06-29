@@ -61,10 +61,16 @@ Reference a library with `$Library <library name>` and share with your friends!
 
 This command will delete an entire library. Ditto will ask for confirmation just to be sure.
 
+### :game_die: Random Photos
+
+#### `$surpriseMe`
+
+Ditto will spit out a random photo for the whole server to enjoy!
+
 ## Future Features
 
-* Reference a random photo function
-* Adding Links & Google Docs to Libraries
+* $surpriseMe function expanded across libraries and users
+* Extended support for external links and Google Docs
 
 ## Credits
 
