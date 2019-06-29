@@ -61,10 +61,10 @@ class Ditto:
         if '$newLibrary' in response.content:
             await self.new_library(response, message.attachments[0])
         elif response.content.lower() in libs:
-            lib = response.content.strip()
+            lib = response.content.lower().strip()
             await self.add_to_library(message, message.attachments[0], lib)
         else:
-            lib = response.content.strip()
+            lib = response.content.lower().strip()
             await self._client.send_message(message.channel, 'That library doesn\'t exist. Would you like to create it?')
             yesmessage = await self._client.wait_for_message(author=user)
             if yesmessage.content.lower().strip() == 'yes':
@@ -95,14 +95,14 @@ class Ditto:
             else:
                 await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>` or type `$stop` to cancel.'))
                 response = await self._client.wait_for_message(author=message.author)
-                if '$stop' not in response.content:
+                if '$stop' not in response.content.lower():
                     await self.new_library(response)
                 else:
                     await self._client.send_message(message.channel, 'This file has not been saved.')
         else:
             await self._client.send_message(message.channel, ('Please provide a name for your new library using `$newLibrary <library name>` or type `$stop` to cancel.'))
             response = await self._client.wait_for_message(author=message.author)
-            if '$stop' not in response.content:
+            if '$stop' not in response.content.lower():
                 await self.new_library(response, img)
             else:
                 await self._client.send_message(message.channel, 'This file has not been saved.')
