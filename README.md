@@ -1,8 +1,6 @@
 <p align="center">
-=======
   <a href="http://www.dittobot.fyi/" target="_blank">
     <img alt="ditto" src="http://www.dittobot.fyi/img/ditto-bot-monogram.svg" width="80px" />
->>>>>>> f8049c4bb08d03fc0dd198ba64fb7624800d9b8e
   </a>
 </p>
 
