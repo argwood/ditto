@@ -51,7 +51,7 @@ class Ditto:
         title = user.display_name + '\'s Libraries'
         desc = ''
         for index, lib in enumerate(libs):
-            desc += '{}. {}\n'.format(index+1, lib)
+            desc += '{}. {}\n'.format(index+1, lib.capitalize())
         desc += '**$newLibrary** <library name>'
         em = discord.Embed(description=desc, title = title, color = self.blurple)
 
@@ -60,7 +60,7 @@ class Ditto:
         response = await self._client.wait_for_message(author=user)
         if '$newLibrary' in response.content:
             await self.new_library(response, message.attachments[0])
-        elif response.content in libs:
+        elif response.content.lower() in libs:
             lib = response.content.strip()
             await self.add_to_library(message, message.attachments[0], lib)
         else:
@@ -69,7 +69,7 @@ class Ditto:
             yesmessage = await self._client.wait_for_message(author=user)
             if yesmessage.content.lower().strip() == 'yes':
                 ditto_backend.create_lib(user.id, lib)
-                await self._client.send_message(message.channel, ('New library `' + lib +'` has been created for `{}`'.format(user.display_name)))
+                await self._client.send_message(message.channel, ('New library `' + lib.capitalize() +'` has been created for `{}`'.format(user.display_name)))
 
     async def new_library(self, message, img):
         """
@@ -82,12 +82,11 @@ class Ditto:
         """
 
         if message.content.startswith('$newLibrary'):
-            print(type(message))
             if len(message.content.split()) > 1:
-                new_lib = message.content.split(None, 1)[1]
+                new_lib = message.content.lower().split(None, 1)[1]
                 if not self.check_for_library(message.author.id, new_lib):
                     ditto_backend.create_lib(message.author.id, new_lib)
-                    await self._client.send_message(message.channel, ('New library `' + new_lib +'` has been created for `{}`'.format(message.author.display_name)))
+                    await self._client.send_message(message.channel, ('New library `' + new_lib.capitalize() +'` has been created for `{}`'.format(message.author.display_name)))
                     await self.add_to_library(message, img, new_lib)
                 else:
                     await self._client.send_message(message.channel, ('That library already exists. Adding the file to it anyways.'))
@@ -117,14 +116,14 @@ class Ditto:
         """
 
         if len(message.content.split()) > 1:
-            lib_to_del = message.content.split(None, 1)[1]
+            lib_to_del = message.content.lower().split(None, 1)[1]
             if self.check_for_library(message.author.id, lib_to_del):
-                await self._client.send_message(message.channel, ('Are you sure you want to delete the entire library `{}`? Type `yes` to delete.'.format(lib_to_del)))
+                await self._client.send_message(message.channel, ('Are you sure you want to delete the entire library `{}`? Type `yes` to delete.'.format(lib_to_del.capitalize())))
                 response = await self._client.wait_for_message(author=message.author)
                 if response.content.lower().strip() == 'yes':
                     success = ditto_backend.remove_lib(message.author.id, lib_to_del)
                     if success:
-                        await self._client.send_message(message.channel, ('Library `{}` has been deleted.'.format(lib_to_del)))
+                        await self._client.send_message(message.channel, ('Library `{}` has been deleted.'.format(lib_to_del.capitalize())))
                     else:
                         await self._client.send_message(message.channel, 'Sorry, that library could\'t be deleted.')
             else:
@@ -142,7 +141,7 @@ class Ditto:
             lib (str): library name to add file to
         """
         ditto_backend.add_img_to_lib(message.author.id, lib, img.get("filename"), img.get("url"))
-        await self._client.send_message(message.channel, 'File added to library `' + lib +'`!')
+        await self._client.send_message(message.channel, 'File added to library `' + lib.capitalize() +'`!')
 
     def check_for_library(self, user, lib):
         """
@@ -157,7 +156,7 @@ class Ditto:
         """
 
         user_libs = ditto_backend.get_user_libs(user)
-        return lib in user_libs
+        return lib.lower() in user_libs
 
     def check_if_img(self, fname):
         """
@@ -183,7 +182,7 @@ class Ditto:
         """
 
         if len(message.content.split()) > 1:
-            lib = message.content.strip().split(None,1)[1]
+            lib = message.content.lower().strip().split(None,1)[1]
             if self.check_for_library(message.author.id, lib):
                 imgs = ditto_backend.get_lib_images(message.author.id, lib)
                 n_files = len(imgs)
@@ -193,27 +192,27 @@ class Ditto:
                         n_imgs-=1
                 n=0
                 if n_files == 0:
-                    msg = await self._client.send_message(message.channel, 'The library `{}` appears to be empty!'.format(lib))
+                    msg = await self._client.send_message(message.channel, 'The library `{}` appears to be empty!'.format(lib.capitalize()))
                     return
                 img0 = ditto_backend.get_lib_image(message.author.id, lib, imgs[n])
                 if n_files == 1 and n_imgs == 1:
-                    msg = await self._client.send_message(message.channel, '{} Photo Tagged "{}" by {} ({}/{})'.format(n_imgs, lib, message.author.display_name, n+1, n_files))
+                    msg = await self._client.send_message(message.channel, '{} Photo Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), message.author.display_name, n+1, n_files))
                     img_msg = await self._client.send_file(message.channel, img0)
                 elif n_files == n_imgs and n_imgs > 1:
-                    msg = await self._client.send_message(message.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib, message.author.display_name, n+1, n_files))
+                    msg = await self._client.send_message(message.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), message.author.display_name, n+1, n_files))
                     img_msg = await self._client.send_file(message.channel, img0)
                 elif n_files == 2 and n_imgs == 1:
-                    msg = await self._client.send_message(message.channel, '{} Photo and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, message.author.display_name, n+1, n_files))
+                    msg = await self._client.send_message(message.channel, '{} Photo and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), message.author.display_name, n+1, n_files))
                     img_msg = await self._client.send_file(message.channel, img0)
 
                 elif n_files > 2 and n_imgs == 1:
-                    msg = await self._client.send_message(message.channel, '{} Photo and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, message.author.display_name, n+1, n_files))
+                    msg = await self._client.send_message(message.channel, '{} Photo and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), message.author.display_name, n+1, n_files))
                     img_msg = await self._client.send_file(message.channel, img0)
                 elif n_files-n_imgs == 1 and n_imgs > 1:
-                    msg = await self._client.send_message(message.channel, '{} Photos and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, message.author.display_name, n+1, n_files))
+                    msg = await self._client.send_message(message.channel, '{} Photos and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), message.author.display_name, n+1, n_files))
                     img_msg = await self._client.send_file(message.channel, img0)
                 elif n_files-n_imgs > 1 and n_imgs > 1:
-                    msg = await self._client.send_message(message.channel, '{} Photos and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, message.author.display_name, n+1, n_files))
+                    msg = await self._client.send_message(message.channel, '{} Photos and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), message.author.display_name, n+1, n_files))
                     img_msg = await self._client.send_file(message.channel, img0)
 
                 await self._client.add_reaction(img_msg, '\u2B05') # left arrow
@@ -248,19 +247,19 @@ class Ditto:
             await self._client.delete_message(img_msg)
             img = ditto_backend.get_lib_image(author.id, lib, imgs[n])
             if n_files == 0:
-                msg = await self._client.send_message(msg.channel, 'The library {} appears to be empty!)'.format(lib))
+                msg = await self._client.send_message(msg.channel, 'The library {} appears to be empty!)'.format(lib.capitalize()))
             elif n_files == 1 and n_imgs == 1:
-                msg = await self._client.send_message(msg.channel, '{} Photo Tagged "{}" by {} ({}/{})'.format(n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photo Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files == n_imgs and n_imgs > 1:
-                msg = await self._client.send_message(msg.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files == 2 and n_imgs == 1:
-                msg = await self._client.send_message(msg.channel, '{} Photo and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photo and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files > 2 and n_imgs == 1:
-                msg = await self._client.send_message(msg.channel, '{} Photo and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photo and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files-n_imgs == 1 and n_imgs > 1:
-                msg = await self._client.send_message(msg.channel, '{} Photos and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photos and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files-n_imgs > 1 and n_imgs > 1:
-                msg = await self._client.send_message(msg.channel, '{} Photos and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photos and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
 
             img_msg = await self._client.send_file(msg.channel, img)
             await self._client.add_reaction(img_msg, '\u2B05') # left arrow
@@ -274,19 +273,19 @@ class Ditto:
             await self._client.delete_message(img_msg)
             img = ditto_backend.get_lib_image(author.id, lib, imgs[n])
             if n_files == 0:
-                msg = await self._client.send_message(msg.channel, 'The library {} appears to be empty!)'.format(lib))
+                msg = await self._client.send_message(msg.channel, 'The library {} appears to be empty!)'.format(lib.capitalize()))
             elif n_files == 1 and n_imgs == 1:
-                msg = await self._client.send_message(msg.channel, '{} Photo Tagged "{}" by {} ({}/{})'.format(n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photo Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files == n_imgs and n_imgs > 1:
-                msg = await self._client.send_message(msg.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photos Tagged "{}" by {} ({}/{})'.format(n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files == 2 and n_imgs == 1:
-                msg = await self._client.send_message(msg.channel, '{} Photo and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photo and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files > 2 and n_imgs == 1:
-                msg = await self._client.send_message(msg.channel, '{} Photo and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photo and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files-n_imgs == 1 and n_imgs > 1:
-                msg = await self._client.send_message(msg.channel, '{} Photos and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photos and {} Other File Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
             elif n_files-n_imgs > 1 and n_imgs > 1:
-                msg = await self._client.send_message(msg.channel, '{} Photos and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib, author.display_name, n+1, n_files))
+                msg = await self._client.send_message(msg.channel, '{} Photos and {} Other Files Tagged "{}" by {} ({}/{})'.format(n_imgs, n_files-n_imgs, lib.capitalize(), author.display_name, n+1, n_files))
 
             img_msg = await self._client.send_file(msg.channel, img)
             await self._client.add_reaction(img_msg, '\u2B05') # left arrow
@@ -317,7 +316,7 @@ class Ditto:
         title = message.author.display_name + '\'s Libraries'
         desc = ''
         for index, lib in enumerate(libs):
-            desc += '{}. {}\n'.format(index+1, lib)
+            desc += '{}. {}\n'.format(index+1, lib.capitalize())
         if len(libs) == 0:
             desc+='You don\'t have any libraries yet! React with `:ditto:` to an image to begin!'
         em = discord.Embed(description=desc, title = title, color = self.blurple)
@@ -334,12 +333,12 @@ class Ditto:
         user_libs = ditto_backend.get_user_libs(message.author.id)
 
         if len(message.content.split()) > 1:
-            lib = message.content.split(None, 1)[1]
+            lib = message.content.lower().split(None, 1)[1]
             if lib in user_libs:
                 random_img = ditto_backend.get_random_image(message.author.id, lib)
                 filename = random_img.split('/')[-1]
                 img_url = ditto_backend.get_lib_image(message.author.id, lib, filename)
-                await self._client.send_message(message.channel, ('Here\'s a random image from the library `{}`.'.format(lib)))
+                await self._client.send_message(message.channel, ('Here\'s a random image from the library `{}`.'.format(lib.capitalize())))
                 await self._client.send_file(message.channel, img_url)
             else:
                 await self._client.send_message(message.channel, ('Library not found. Use `$surpriseMe <library name>` to get a random photo from that library.'))

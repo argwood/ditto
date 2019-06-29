@@ -4,14 +4,22 @@ import asyncio
 import ditto
 
 '''
-ditto: your media squire for Discord
+Ditto - your media squire for Discord
 
-usage: python3 start_ditto.py
+Provide bot token as environment variable:
+    export TOKEN='my_token_here'
+
+Usage:
+    python3 start_ditto.py
 '''
 
 client = discord.Client()
 
-token = os.environ['TOKEN']
+try:
+    token = os.environ['TOKEN']
+except KeyError:
+    print('Make sure you\'ve provided your bot token as an environment variable. Use: export TOKEN = \'my_token_here\'.')
+    client.close()
 
 _ditto = ditto.Ditto(client)
 @client.event
