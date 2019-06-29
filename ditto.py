@@ -70,6 +70,7 @@ class Ditto:
             if yesmessage.content.lower().strip() == 'yes':
                 ditto_backend.create_lib(user.id, lib)
                 await self._client.send_message(message.channel, ('New library `' + lib.capitalize() +'` has been created for `{}`'.format(user.display_name)))
+                await self.add_to_library(message, message.attachments[0], lib)
 
     async def new_library(self, message, img):
         """
